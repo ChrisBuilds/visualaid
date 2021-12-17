@@ -60,6 +60,7 @@ class Grid:
         gridline_color=(0, 0, 0),
         bg_color=(255, 255, 255),
         frame_counter_text=True,
+        flip_vertical=False,
     ):
         self.grid_x = grid_x
         self.grid_y = grid_y
@@ -70,6 +71,7 @@ class Grid:
         self.gridline_color = gridline_color
         self.bg_color = bg_color
         self._frame_counter_text = frame_counter_text
+        self.flip_vertical = flip_vertical
         self.frame_counter_text_color = (0, 0, 0)
         self.holdresult = 0
         self.grid_image_height = (self.grid_y * self.cell_height) + (
@@ -152,6 +154,9 @@ class Grid:
 
     def fill_cell(self, coord, fill=(0, 0, 0)):
         x, y = coord
+        if self.flip_vertical:
+            y = (self.grid_y - 1) - (abs(y))
+
         gridspace = self._gridlines * self.gridline_width
         x0 = (x * self.cell_width) + (x * gridspace) + gridspace
         y0 = (y * self.cell_height) + (y * gridspace) + gridspace
@@ -311,11 +316,10 @@ def align_coords(coords):
     """Adjust all coordinates such that x >= 0 and y >= 0"""
     min_x = min([coord[0] for coord in coords])
     min_y = min([coord[1] for coord in coords])
-    x_adjust = abs(0 - min_x)
-    y_adjust = abs(0 - min_y)
+    x_adjust = abs(0 - min_x) if min_x < 0 else 0
+    y_adjust = abs(0 - min_y) if min_y < 0 else 0
     print(f"min_x: {min_x}\nmin_y: {min_y}")
-    aligned_coords = [(coord[0] + x_adjust, coord[1] + y_adjust) for coord in coords]
-    return aligned_coords
+    return (x_adjust, y_adjust)
 
 
 def main():
