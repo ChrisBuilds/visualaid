@@ -307,6 +307,17 @@ class Animator:
                 yield frame_image
 
 
+def align_coords(coords):
+    """Adjust all coordinates such that x >= 0 and y >= 0"""
+    min_x = min([coord[0] for coord in coords])
+    min_y = min([coord[1] for coord in coords])
+    x_adjust = abs(0 - min_x)
+    y_adjust = abs(0 - min_y)
+    print(f"min_x: {min_x}\nmin_y: {min_y}")
+    aligned_coords = [(coord[0] + x_adjust, coord[1] + y_adjust) for coord in coords]
+    return aligned_coords
+
+
 def main():
     pass
 
