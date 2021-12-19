@@ -81,7 +81,7 @@ class Grid:
             (self._gridlines * (self.grid_x + 1)) * self.gridline_width
         )
         self.frame_counter_text_height = (
-            max(15, int(0.1 * self.grid_image_height)) * self._frame_counter_text
+            max(15, int(0.025 * self.grid_image_height)) * self._frame_counter_text
         )
         self.image_width = (
             self.grid_image_width + 0
