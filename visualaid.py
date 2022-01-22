@@ -114,6 +114,12 @@ class Grid:
         self.unprocesssed_frames = 0
 
     def _draw_gridlines(self):
+        """
+        Draws the gridlines on the image.
+
+        :param self: The object that is calling the method
+        :return: None
+        """
         gridline_width_expansion = 0
         if self.gridline_width >= 3:
             gridline_width_expansion = ceil(self.gridline_width / 2) - 1
@@ -140,10 +146,26 @@ class Grid:
             )
 
     def _draw_image(self):
+        """
+        If the gridlines are turned on, draw them.
+
+        :param self: This is the object that is being drawn
+        :return: None
+        """
         if self._gridlines:
             self._draw_gridlines()
 
     def _draw_frame_counter_text(self, frame, text, frame_pos, total_fames):
+        """
+        Draws the frame counter text on the frame.
+
+        :param self: This is the instance of the class
+        :param frame: The image to draw the frame counter on
+        :param text: The text to be displayed
+        :param frame_pos: The current frame number
+        :param total_fames: The total number of frames in the video
+        :return: The frame with the frame counter text drawn on it.
+        """
         frame_counter_text_pos = (3, self.grid_image_height + 3)
         ImageDraw.Draw(frame).text(
             frame_counter_text_pos,
@@ -153,6 +175,14 @@ class Grid:
         return frame
 
     def fill_cell(self, coord, fill=(0, 0, 0)):
+        """
+        Fill a cell with a color.
+
+        :param self: The object that called the method
+        :param coord: The coordinate of the cell to be filled
+        :param fill: The color of the rectangle
+        :return: None
+        """
         x, y = coord
         if self.flip_vertical:
             y = (self.grid_y - 1) - (abs(y))
@@ -166,15 +196,34 @@ class Grid:
         self.draw.rectangle(bbox, fill)
 
     def show_image(self):
+        """
+        Display the image in the ImageViewer.
+
+        :param self: This is the object that is calling the method
+        :return: None
+        """
         self._draw_image()
         self.image.show()
 
     def save_image(self, filename="out.png"):
+        """
+        Save the image to a file.
+
+        :param self: This is the object that is being called
+        :param filename: the name of the file to save the image to, defaults to out.png (optional)
+        :return: None
+        """
         self._draw_image()
         self.image.save(filename)
 
     def _create_bytesio_object(self, image_obj):
-        """Return image as BytesIO object in memory"""
+        """
+        Create a BytesIO object in memory from an image object.
+
+        :param self: This is the instance of the class
+        :param image_obj: The image object to be converted
+        :return: A BytesIO object.
+        """
         byte_img = BytesIO()
         image_obj.save(byte_img, "PNG")
         return byte_img
@@ -235,7 +284,11 @@ class Grid:
             Duration in miliseconds to display the final frame before looping. default = 0ms
         """
         # duplicate the final frame to fill the holdresult duration
-        holdframe_count = int(self.holdresult / duration)
+        if duration == 0:
+            hold_duration = 1
+        else:
+            hold_duration = duration
+        holdframe_count = int(self.holdresult / hold_duration)
         for _ in range(holdframe_count):
             self.save_frame()
         frame_gen = self._frames_gen(holdframe_count)
@@ -247,6 +300,41 @@ class Grid:
             loop=loop,
             duration=duration,
         )
+
+    def neighbors(self, cell, diag=True):
+        """
+        Returns a list of cell coordinates surrounding the given cell.
+
+        Parameters
+        ----------
+        cell: tuple(int,int)
+            A tuple with coordinates in range(grid_x) and range(grid_y)
+
+        Returns
+        -------
+        list[tuple(int, int)]
+            All valid neighboring cells
+        """
+        x, y = cell
+        if diag:
+            possible_neighbor_cells = (
+                (x - 1, y - 1),
+                (x - 1, y),
+                (x - 1, y + 1),
+                (x, y - 1),
+                (x, y + 1),
+                (x + 1, y - 1),
+                (x + 1, y),
+                (x + 1, y + 1),
+            )
+        else:
+            possible_neighbor_cells = ((x - 1, y), (x, y - 1), (x, y + 1), (x + 1, y))
+        neighbor_cells = [
+            (x, y)
+            for x, y in possible_neighbor_cells
+            if x in range(self.grid_x) and y in range(self.grid_y)
+        ]
+        return neighbor_cells
 
 
 class Animator:
@@ -263,6 +351,20 @@ class Animator:
         holdresult=0,
         resize=None,
     ):
+        """
+        Create an animated PNG from a series of images.
+
+        :param self: This is the instance of the class
+        :param visuals: a list of visuals to be animated
+        :param filename: The name of the file to save the animation to, defaults to out.apng (optional)
+        :param loop: The number of times to loop the animation. 0 means loop forever, defaults to 0
+        (optional)
+        :param duration: The duration of each frame in milliseconds, defaults to 100 (optional)
+        :param holdresult: The number of frames to hold the result of the animation, defaults to 0
+        (optional)
+        :param resize: None or a tuple of (width, height)
+        :return: None
+        """
         self.resize = resize
         holdframe_count = int(holdresult / duration)
         frame_gen = self._frames_gen(visuals, duration, holdframe_count)
@@ -276,6 +378,19 @@ class Animator:
         )
 
     def _frames_gen(self, visuals, duration, holdframe_count):
+        """
+        The function loops through all the visuals and creates a list of all the frames for each visual.
+
+        Then it loops through the list of frames and creates a generator that yields each frame.
+
+        The generator is used to create the animation.
+
+        :param self: The instance of the class
+        :param visuals: a list of Visual objects
+        :param duration: The duration of the animation in seconds
+        :param holdframe_count: The number of frames to repeat a frame before starting to generate the next frame
+        :return: None
+        """
         processed_frames = 1
         total_frames = 0
         if holdframe_count:
@@ -313,7 +428,13 @@ class Animator:
 
 
 def align_coords(coords):
-    """Adjust all coordinates such that x >= 0 and y >= 0"""
+    """
+    Given a list of coordinates, return a list of coordinates with x and y values adjusted such that x
+    >= 0 and y >= 0.
+
+    :param coords: The list of coordinates to be adjusted
+    :return: (0, 0)
+    """
     min_x = min([coord[0] for coord in coords])
     min_y = min([coord[1] for coord in coords])
     x_adjust = abs(0 - min_x) if min_x < 0 else 0
