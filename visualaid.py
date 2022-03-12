@@ -303,17 +303,12 @@ class Grid:
 
     def neighbors(self, cell, diag=True):
         """
-        Returns a list of cell coordinates surrounding the given cell.
+        Return a list of all the neighbors of a given cell.
 
-        Parameters
-        ----------
-        cell: tuple(int,int)
-            A tuple with coordinates in range(grid_x) and range(grid_y)
-
-        Returns
-        -------
-        list[tuple(int, int)]
-            All valid neighboring cells
+        :param self: This is the object that is being called
+        :param cell: the cell to get the neighbors of
+        :param diag: True if diagonal moves are allowed, False if not, defaults to True (optional)
+        :return: A list of tuples.
         """
         x, y = cell
         if diag:
