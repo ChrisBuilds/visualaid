@@ -80,12 +80,8 @@ class Grid:
         self.grid_image_width = (self.grid_x * self.cell_width) + (
             (self._gridlines * (self.grid_x + 1)) * self.gridline_width
         )
-        self.frame_counter_text_height = (
-            max(15, int(0.025 * self.grid_image_height)) * self._frame_counter_text
-        )
-        self.image_width = (
-            self.grid_image_width + 0
-        )  # 0 placeholder for potential side text
+        self.frame_counter_text_height = max(15, int(0.025 * self.grid_image_height)) * self._frame_counter_text
+        self.image_width = self.grid_image_width + 0  # 0 placeholder for potential side text
         self.image_height = self.grid_image_height + self.frame_counter_text_height
 
         self.colors = {
@@ -325,9 +321,7 @@ class Grid:
         else:
             possible_neighbor_cells = ((x - 1, y), (x, y - 1), (x, y + 1), (x + 1, y))
         neighbor_cells = [
-            (x, y)
-            for x, y in possible_neighbor_cells
-            if x in range(self.grid_x) and y in range(self.grid_y)
+            (x, y) for x, y in possible_neighbor_cells if x in range(self.grid_x) and y in range(self.grid_y)
         ]
         return neighbor_cells
 
@@ -340,18 +334,18 @@ class Animator:
     def save_animation(
         self,
         visuals,
-        filename="out.apng",
+        filename="out.gif",
         loop=0,
         duration=100,
         holdresult=0,
         resize=None,
     ):
         """
-        Create an animated PNG from a series of images.
+        Create an animated GIF from a series of images.
 
         :param self: This is the instance of the class
         :param visuals: a list of visuals to be animated
-        :param filename: The name of the file to save the animation to, defaults to out.apng (optional)
+        :param filename: The name of the file to save the animation to, defaults to out.gif (optional)
         :param loop: The number of times to loop the animation. 0 means loop forever, defaults to 0
         (optional)
         :param duration: The duration of each frame in milliseconds, defaults to 100 (optional)
